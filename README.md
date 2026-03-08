@@ -26,7 +26,7 @@ First, create a trigger instance with your project configuration.
 import { createChangelogTrigger } from '@avada/firestore-bigquery-changelog';
 
 const changelog = createChangelogTrigger({
-  appId: 'your-app-id',
+  appId: 'your-app-id', // orderLimit, cookieBar
   projectId: 'your-firebase-project-id',
   apiKey: 'your-api-key', // Optional: if not using CHANGELOG_API_KEY env var
   // Optional: apiUrl if not using environment defaults
