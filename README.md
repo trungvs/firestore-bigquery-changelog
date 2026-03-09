@@ -113,6 +113,33 @@ const handlers = changelog.onWriteMany([
 | `pickKeys` | `string[]` | Fields to extract from the document. |
 | `transformRow` | `function` | Async/sync function to modify the row. |
 
+## Development
+
+### Building the project
+
+To compile the TypeScript source code into the `lib` directory:
+
+```bash
+npm run build
+```
+
+### Publishing to NPM
+
+1. **Login to NPM** (if not already):
+   ```bash
+   npm login
+   ```
+
+2. **Update version**:
+   Update the `version` in `package.json` (e.g., `0.1.1`).
+
+3. **Publish**:
+   ```bash
+   npm publish --access public
+   ```
+   *Note: The `prepublishOnly` script will automatically run `npm run build` before publishing.*
+
 ## License
 
 MIT
+
