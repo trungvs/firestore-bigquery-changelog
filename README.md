@@ -7,6 +7,8 @@ SDK to log Firestore document changelog to an API (BigQuery Proxy). This package
 - Support for both Firebase Functions V1 and V2.
 - Automatic `snake_case` conversion for picked fields.
 - Customizable row transformation.
+- Custom destination table name for BigQuery.
+- Upsert (MERGE) mode with composite keys support.
 - Efficient batch handling.
 - Built-in TypeScript support.
 
@@ -53,7 +55,7 @@ export const onProductWrite = functions.firestore
 ```typescript
 import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
-export const onOrderWrite = onDocumentWritten('orders/{orderId}', 
+export const onOrderWrite = onDocumentWritten('orders/{orderId}',
   changelog.onWriteV2({
     collectionId: 'orders',
     destinationTable: 'v2_orders_data' // Optional: Custom BigQuery table name
@@ -62,6 +64,39 @@ export const onOrderWrite = onDocumentWritten('orders/{orderId}',
 ```
 
 ## Advanced Configuration
+
+### Custom Destination Table
+
+By default, the API resolves the BigQuery table name from `appId` and `collectionId`. Use `destinationTable` to specify a custom table name directly.
+
+```typescript
+changelog.onWrite({
+  collectionId: 'shops',
+  destinationTable: 'avada_customer', // Write to this BigQuery table instead
+})
+```
+
+### Upsert Mode (MERGE)
+
+Use `upsertKeys` to enable upsert mode. Instead of appending a new row for every change, the API will MERGE (insert or update) based on the specified keys.
+
+This is useful for maintaining a single row per entity (e.g., a CRM table with one row per shop).
+
+```typescript
+// Each shop change will upsert into avada_customer table
+// matched by shopifyDomain (composite keys supported)
+changelog.onWriteV2({
+  collectionId: 'shops',
+  destinationTable: 'avada_customer',
+  upsertKeys: ['shopifyDomain'],
+})
+```
+
+When `upsertKeys` is set:
+- The API parses the `data` JSON field and picks configured fields (configured on API side).
+- MERGE uses `ON` condition with all upsert keys (auto-converted to `snake_case`).
+- DELETE operations are skipped (no data to merge).
+- Fields not present in the document are left unchanged in BigQuery.
 
 ### Custom Data Transformation
 
@@ -111,9 +146,10 @@ const handlers = changelog.onWriteMany([
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | `collectionId` | `string` | **Required**. Firestore collection name. |
-| `destinationTable` | `string` | Optional. Destination table name on BigQuery. Defaults to `collectionId` if not provided. |
-| `pickKeys` | `string[]` | Optional. Fields to extract from the document. |
-| `transformRow` | `function` | Optional. Async/sync function to modify the row. |
+| `destinationTable` | `string` | Optional. Custom BigQuery table name. Defaults to auto-resolved from `appId` and `collectionId`. |
+| `pickKeys` | `string[]` | Optional. Fields to extract from the document as extra columns (auto `snake_case`). |
+| `upsertKeys` | `string[]` | Optional. camelCase field names for MERGE mode. When set, API will upsert instead of insert. |
+| `transformRow` | `function` | Optional. Async/sync function to modify the row before sending. |
 
 ## Development
 
@@ -144,4 +180,3 @@ npm run build
 ## License
 
 MIT
-

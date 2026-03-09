@@ -12,8 +12,7 @@ export const createChangelogTrigger = (config: ChangelogTriggerConfig) => {
   const {sendRow} = createApiClient(config);
 
   const onWrite = (collectionConfig: CollectionConfig) => {
-    const {collectionId, destinationTable, pickKeys = [], transformRow} = collectionConfig;
-    const targetCollection = destinationTable || collectionId;
+    const {collectionId, destinationTable, upsertKeys, pickKeys = [], transformRow} = collectionConfig;
 
     return async (change: FirestoreChange, context: FirestoreContext): Promise<boolean> => {
       const defaultRow = generateDefaultRow({
@@ -33,7 +32,7 @@ export const createChangelogTrigger = (config: ChangelogTriggerConfig) => {
         row = await transformRow(row);
       }
 
-      await sendRow(row, targetCollection);
+      await sendRow(row, collectionId, destinationTable, upsertKeys);
       return true;
     };
   };

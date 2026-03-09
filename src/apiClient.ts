@@ -7,7 +7,12 @@ export const createApiClient = (config: ChangelogTriggerConfig) => {
   const customHeaders = config.headers ?? {};
   const timeout = config.timeout ?? DEFAULT_TIMEOUT;
 
-  const sendRow = async (row: Record<string, unknown>, collectionId: string) => {
+  const sendRow = async (
+    row: Record<string, unknown>,
+    collectionId: string,
+    destinationTable?: string,
+    upsertKeys?: string[]
+  ) => {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
@@ -21,7 +26,7 @@ export const createApiClient = (config: ChangelogTriggerConfig) => {
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers,
-        body: JSON.stringify({collectionId, row}),
+        body: JSON.stringify({collectionId, destinationTable, upsertKeys, row}),
         signal: controller.signal
       });
 

@@ -20,6 +20,8 @@ export interface CollectionConfig {
   destinationTable?: string;
   /** Fields to pick from the document and add as extra columns (auto snake_case). */
   pickKeys?: string[];
+  /** camelCase key fields for upsert mode. When set, API will MERGE instead of INSERT. */
+  upsertKeys?: string[];
   /** Custom transform function to modify the row before sending. */
   transformRow?: (row: ChangelogRow) => ChangelogRow | Promise<ChangelogRow>;
 }
