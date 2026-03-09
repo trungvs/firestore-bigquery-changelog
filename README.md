@@ -55,7 +55,8 @@ import { onDocumentWritten } from 'firebase-functions/v2/firestore';
 
 export const onOrderWrite = onDocumentWritten('orders/{orderId}', 
   changelog.onWriteV2({
-    collectionId: 'orders'
+    collectionId: 'orders',
+    destinationTable: 'v2_orders_data' // Optional: Custom BigQuery table name
   })
 );
 ```
@@ -110,8 +111,9 @@ const handlers = changelog.onWriteMany([
 | Option | Type | Description |
 | :--- | :--- | :--- |
 | `collectionId` | `string` | **Required**. Firestore collection name. |
-| `pickKeys` | `string[]` | Fields to extract from the document. |
-| `transformRow` | `function` | Async/sync function to modify the row. |
+| `destinationTable` | `string` | Optional. Destination table name on BigQuery. Defaults to `collectionId` if not provided. |
+| `pickKeys` | `string[]` | Optional. Fields to extract from the document. |
+| `transformRow` | `function` | Optional. Async/sync function to modify the row. |
 
 ## Development
 

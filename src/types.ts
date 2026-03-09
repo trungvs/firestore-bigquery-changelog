@@ -16,6 +16,8 @@ export interface ChangelogTriggerConfig {
 export interface CollectionConfig {
   /** Firestore collection ID (e.g. 'purchaseActivities') */
   collectionId: string;
+  /** Destination table name on BigQuery. Defaults to collectionId if not provided. */
+  destinationTable?: string;
   /** Fields to pick from the document and add as extra columns (auto snake_case). */
   pickKeys?: string[];
   /** Custom transform function to modify the row before sending. */
